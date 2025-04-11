@@ -45,6 +45,6 @@ public class MainActivity2 extends AppCompatActivity {
         MA2_binding.webView.getSettings().setDatabaseEnabled(true);
         MA2_binding.webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         MA2_binding.webView.setWebChromeClient(new WebChromeClient());
-        MA2_binding.webView.loadUrl("https://online.hcmute.edu.vn/");
+        MA2_binding.webView.loadUrl("http://iotstar.vn/");
     }
 }
