@@ -73,42 +73,64 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/img_account"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_account"
-                android:clickable="true"
-                android:focusable="true"/>
+                tools:ignore="SpeakableTextPresentCheck" />
+
             <ImageView
                 android:id="@+id/img_favorite"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_favorite"
-                android:clickable="true"
-                android:focusable="true"/>
+                tools:ignore="SpeakableTextPresentCheck" />
+
             <ImageView
                 android:id="@+id/img_share"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_share"
-                android:clickable="true"
-                android:focusable="true"/>
+                tools:ignore="SpeakableTextPresentCheck" />
+
             <ImageView
                 android:id="@+id/img_more"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="0.25"
+                android:clickable="true"
+                android:focusable="true"
                 android:padding="8dp"
                 android:src="@drawable/ic_more"
-                android:clickable="true"
-                android:focusable="true"/>
+                tools:ignore="SpeakableTextPresentCheck" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/txt_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="Unable to play this video"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

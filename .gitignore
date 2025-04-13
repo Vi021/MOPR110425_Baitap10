@@ -32,3 +32,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# My files
+/app/src/main/java/vn/iotstar/ltmob110425/Refs.java
