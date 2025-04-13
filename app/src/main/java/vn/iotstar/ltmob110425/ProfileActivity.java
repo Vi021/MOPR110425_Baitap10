@@ -43,7 +43,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
-    private ImageView img_pfp;
+    private ImageView img_logout, img_pfp;
     private Button btn_uploadVideo;
     private ProgressBar uploadProgressBar;
 
@@ -64,10 +64,28 @@ public class ProfileActivity extends AppCompatActivity {
             MainActivity.isInitialized = true;
         }
 
+        img_logout = findViewById(R.id.img_logout);
+        img_logout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        });
+
         img_pfp = findViewById(R.id.img_pfp);
 
         btn_uploadVideo = findViewById(R.id.btn_uploadVideo);
-        btn_uploadVideo.setOnClickListener(v -> checkPermissionsAndPickVideo());
+        btn_uploadVideo.setOnClickListener(v -> {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null) {
+                checkPermissionsAndPickVideo();
+            } else {
+                Toast toast = Toast.makeText(this, "Please sign in first!", Toast.LENGTH_SHORT);
+                toast.show();
+                new Handler().postDelayed(toast::cancel, 1200);
+            }
+        });
 
         uploadProgressBar = findViewById(R.id.uploadProgressBar);
     }
@@ -135,8 +153,6 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void uploadVideoToCloudinary(String filePath) {
-
-
         MediaManager.get().upload(filePath)
                 .option("resource_type", "video")
                 .option("upload_preset", "mopr110425_unsigned")
@@ -167,51 +183,46 @@ public class ProfileActivity extends AppCompatActivity {
                         new Handler().postDelayed(toast::cancel, 1200);
 
                         // store in Firestore
-                        FirebaseAuth.getInstance()
-                                .signInAnonymously()
-                                .addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                        if (user != null) {
-                                            LayoutInflater inflater = LayoutInflater.from(ProfileActivity.this);
-                                            View dialogView = inflater.inflate(R.layout.dialog_videometadata, null);
+                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                        if (user != null) {
+                            LayoutInflater inflater = LayoutInflater.from(ProfileActivity.this);
+                            View dialogView = inflater.inflate(R.layout.dialog_videometadata, null);
 
-                                            EditText eTxt_title = dialogView.findViewById(R.id.eTxt_title);
-                                            EditText eTxt_desc = dialogView.findViewById(R.id.eTxt_desc);
+                            EditText eTxt_title = dialogView.findViewById(R.id.eTxt_title);
+                            EditText eTxt_desc = dialogView.findViewById(R.id.eTxt_desc);
 
-                                            new AlertDialog.Builder(ProfileActivity.this)
-                                                    .setTitle("Video Details")
-                                                    .setView(dialogView)
-                                                    .setPositiveButton("Save", (dialog, which) -> {
-                                                        String title = eTxt_title.getText().toString().trim();
-                                                        String desc = eTxt_desc.getText().toString().trim();
+                            new AlertDialog.Builder(ProfileActivity.this)
+                                    .setTitle("Video Details")
+                                    .setView(dialogView)
+                                    .setPositiveButton("Save", (dialog, which) -> {
+                                        String title = eTxt_title.getText().toString().trim();
+                                        String desc = eTxt_desc.getText().toString().trim();
+                                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                                                        VideoShortModel videoData = new VideoShortModel(title, desc, videoUrl);
+                                        VideoShortModel videoData = new VideoShortModel(title, desc, videoUrl, userId);
 
-                                                        DatabaseReference dbRef = FirebaseDatabase.getInstance(Refs.VIDEO_SHORTS_FIREBASE_URL).getReference(Refs.VIDEO_SHORTS_URL);
-                                                        String uploadId = dbRef.push().getKey();
+                                        DatabaseReference dbRef = FirebaseDatabase.getInstance(Refs.VIDEO_SHORTS_FIREBASE_URL).getReference(Refs.VIDEO_SHORTS_URL);
+                                        String uploadId = dbRef.push().getKey();
 
-                                                        if (uploadId != null) {
-                                                            dbRef.child(uploadId).setValue(videoData)
-                                                                    .addOnSuccessListener(unused -> {
-                                                                        Log.d("RealtimeDB", "Metadata saved: " + uploadId);
-                                                                        Toast t = Toast.makeText(ProfileActivity.this, "Metadata saved to Realtime DB!", Toast.LENGTH_SHORT);
-                                                                        t.show();
-                                                                        new Handler().postDelayed(t::cancel, 1200);
-                                                                    })
-                                                                    .addOnFailureListener(e -> {
-                                                                        Log.e("RealtimeDB", "Error saving", e);
-                                                                        Toast t = Toast.makeText(ProfileActivity.this, "Failed to save metadata", Toast.LENGTH_SHORT);
-                                                                        t.show();
-                                                                        new Handler().postDelayed(t::cancel, 1200);
-                                                                    });
-                                                        }
+                                        if (uploadId != null) {
+                                            dbRef.child(uploadId).setValue(videoData)
+                                                    .addOnSuccessListener(unused -> {
+                                                        Log.d("RealtimeDB", "Metadata saved: " + uploadId);
+                                                        Toast t = Toast.makeText(ProfileActivity.this, "Metadata saved to Realtime DB!", Toast.LENGTH_SHORT);
+                                                        t.show();
+                                                        new Handler().postDelayed(t::cancel, 1200);
                                                     })
-                                                    .setNegativeButton("Cancel", null)
-                                                    .show();
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("RealtimeDB", "Error saving", e);
+                                                        Toast t = Toast.makeText(ProfileActivity.this, "Failed to save metadata", Toast.LENGTH_SHORT);
+                                                        t.show();
+                                                        new Handler().postDelayed(t::cancel, 1200);
+                                                    });
                                         }
-                                    }
-                                });
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        }
                     }
 
                     @Override
