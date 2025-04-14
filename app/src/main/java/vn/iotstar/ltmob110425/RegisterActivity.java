@@ -3,6 +3,7 @@ package vn.iotstar.ltmob110425;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,6 +15,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText eTxt_email, eTxt_password;
@@ -51,10 +55,30 @@ public class RegisterActivity extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            startActivity(new Intent(this, ProfileActivity.class));
-                            finish();
+                            FirebaseUser user = auth.getCurrentUser();
+                            if (user != null) {
+                                AccountModel account = new AccountModel(user.getEmail(), "", 0); // default
+
+                                DatabaseReference userRef = FirebaseDatabase.getInstance(Refs.VIDEO_SHORTS_FIREBASE_URL).getReference(Refs.USERS_URL);
+
+                                userRef.child(user.getUid()).setValue(account)
+                                        .addOnSuccessListener(unused -> {
+                                            Intent intent = new Intent(this, ProfileActivity.class);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
+                                            finish();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("RealtimeDB", "Error saving", e);
+                                            Toast t = Toast.makeText(RegisterActivity.this, "Failed to save to RealtimeDB", Toast.LENGTH_SHORT);
+                                            t.show();
+                                            new Handler().postDelayed(t::cancel, 1200);
+                                        });
+                            }
                         } else {
-                            Toast.makeText(this, "Signup failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast toast = Toast.makeText(this, "Signup failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT);
+                            toast.show();
+                            new Handler().postDelayed(toast::cancel, 1200);
                         }
                     });
         });

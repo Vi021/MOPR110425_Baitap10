@@ -12,16 +12,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private VideoShortAdapter VS_adapter;
-    private ImageView img_myAccount;
+    private CircleImageView img_myAccount;
     public static boolean isInitialized = false;
 
     @Override
@@ -48,9 +51,11 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(VS_adapter);
 
         img_myAccount = findViewById(R.id.img_myAccount);
+        loadMyAccountPFP();
+
         img_myAccount.setOnClickListener(v -> {
-            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             Intent intent;
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser == null) {
                 intent = new Intent(MainActivity.this, LoginActivity.class);
             } else {
@@ -60,9 +65,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void loadMyAccountPFP() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference userRef = FirebaseDatabase
+                    .getInstance(Refs.VIDEO_SHORTS_FIREBASE_URL)
+                    .getReference(Refs.USERS_URL).child(currentUser.getUid());
+            userRef.child("pfpUrl").get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    String pfpUrl = task.getResult().getValue(String.class);
+                    if (pfpUrl != null && !pfpUrl.isEmpty()) {
+                        Glide.with(this)
+                                .load(pfpUrl)
+                                .into(img_myAccount);
+                    }
+                }
+            });
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        loadMyAccountPFP();
         VS_adapter.startListening();
     }
 
