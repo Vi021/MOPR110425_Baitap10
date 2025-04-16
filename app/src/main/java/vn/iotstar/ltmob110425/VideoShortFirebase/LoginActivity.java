@@ -1,4 +1,4 @@
-package vn.iotstar.ltmob110425;
+package vn.iotstar.ltmob110425.VideoShortFirebase;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +15,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import vn.iotstar.ltmob110425.R;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText eTxt_email, eTxt_password;

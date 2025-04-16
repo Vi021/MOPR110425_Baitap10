@@ -1,7 +1,8 @@
-package vn.iotstar.ltmob110425;
+package vn.iotstar.ltmob110425.VideoShortFirebase;
 
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
@@ -17,10 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import vn.iotstar.ltmob110425.R;
 
 public class VideoShortAdapter extends FirebaseRecyclerAdapter<VideoShortModel, VideoShortAdapter.VideoShortViewHolder> {
     private boolean isFavorite = false;
@@ -88,10 +93,10 @@ public class VideoShortAdapter extends FirebaseRecyclerAdapter<VideoShortModel, 
             float scaleX = 1f;
             float scaleY = 1f;
             if (videoRatio > viewRatio) {
-                // Video is wider than the view, scale by width
+                // video is wider than the view, scale by width
                 scaleY = videoRatio / viewRatio;
             } else {
-                // Video is taller than the view, scale by height
+                // video is taller than the view, scale by height
                 scaleX = viewRatio / videoRatio;
             }
             holder.videoView.setScaleX(1f / scaleX);
@@ -101,6 +106,12 @@ public class VideoShortAdapter extends FirebaseRecyclerAdapter<VideoShortModel, 
         holder.img_account.setOnClickListener(v -> {});
         holder.txt_likeCount.setText(String.valueOf(model.getLikeCount()));
         holder.img_favorite.setOnClickListener(v -> {
+            if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                Toast toast = Toast.makeText(holder.img_favorite.getContext(), "Please sign in first!", Toast.LENGTH_SHORT);
+                toast.show();
+                new Handler().postDelayed(toast::cancel, 1200);
+                return;
+            }
             if (isFavorite) {
                 holder.img_favorite.setImageResource(R.drawable.ic_favorite_filled_ff3352);
                 holder.txt_likeCount.setText(String.valueOf(model.getLikeCount()+1));

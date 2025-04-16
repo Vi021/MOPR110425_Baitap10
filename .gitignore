@@ -34,4 +34,4 @@ google-services.json
 *.hprof
 
 # My files
-/app/src/main/java/vn/iotstar/ltmob110425/Refs.java
+/app/src/main/java/vn/iotstar/ltmob110425/VideoShortFirebase/Refs.java

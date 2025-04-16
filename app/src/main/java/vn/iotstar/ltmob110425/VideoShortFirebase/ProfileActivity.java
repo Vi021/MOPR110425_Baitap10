@@ -1,4 +1,4 @@
-package vn.iotstar.ltmob110425;
+package vn.iotstar.ltmob110425.VideoShortFirebase;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.READ_MEDIA_IMAGES;
@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import vn.iotstar.ltmob110425.R;
 
 public class ProfileActivity extends AppCompatActivity {
     private ImageView img_logout;

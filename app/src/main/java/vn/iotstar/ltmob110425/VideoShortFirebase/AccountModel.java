@@ -1,4 +1,4 @@
-package vn.iotstar.ltmob110425;
+package vn.iotstar.ltmob110425.VideoShortFirebase;
 
 import java.io.Serializable;
 

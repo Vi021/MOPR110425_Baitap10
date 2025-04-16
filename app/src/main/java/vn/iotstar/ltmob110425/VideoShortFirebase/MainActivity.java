@@ -1,9 +1,8 @@
-package vn.iotstar.ltmob110425;
+package vn.iotstar.ltmob110425.VideoShortFirebase;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import vn.iotstar.ltmob110425.R;
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
